@@ -12,9 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    // Add suppressHydrationWarning here!
+    <html lang="en" suppressHydrationWarning>
       <body>
-        {/* The Telegram Script - Essential! */}
         <Script 
           src="https://telegram.org/js/telegram-web-app.js" 
           strategy="beforeInteractive" 

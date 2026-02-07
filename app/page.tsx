@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const [username, setUsername] = useState('Neighbour');
+  const router = useRouter();
 
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
@@ -30,7 +32,7 @@ export default function Home() {
       <button
         className="relative inline-flex items-center justify-center px-10 py-4 font-bold text-slate-900 transition-all duration-200 bg-yellow-400 font-pj rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900
         animate-pulse hover:animate-none hover:scale-105 active:scale-95"
-      >
+       onClick={() => router.push('/shops')}>
         <span className="relative">View Shops 🔥</span>
         {/* Simple "Light" animation glow */}
         <div className="absolute -inset-1 bg-gradient-to-r from-yellow-600 to-yellow-300 rounded-xl blur opacity-25 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
