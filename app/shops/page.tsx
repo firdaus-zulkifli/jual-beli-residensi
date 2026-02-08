@@ -51,11 +51,25 @@ export default function ShopList() {
       });
   }, []);
 
+  const goBack = () => {
+    const tg = (window as any).Telegram?.WebApp;
+    tg?.HapticFeedback?.impactOccurred('light');
+    router.back();
+  };
+
+  const handleShopClick = (shopDescription: string) => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg?.HapticFeedback) {
+      tg.HapticFeedback.impactOccurred('light');
+    }
+    alert(`Shop Info: ${shopDescription}`);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 text-white p-6">
         <header className="mb-8">
-          <button onClick={() => router.back()} className="text-yellow-400 mb-4">← Back</button>
+          <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
           <h1 className="text-2xl font-bold">Open Shops Today 🏪</h1>
           <p className="text-slate-400">Support your neighbors, buy local!</p>
         </header>
@@ -70,7 +84,7 @@ export default function ShopList() {
     return (
       <div className="min-h-screen bg-slate-900 text-white p-6">
         <header className="mb-8">
-          <button onClick={() => router.back()} className="text-yellow-400 mb-4">← Back</button>
+          <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
           <h1 className="text-2xl font-bold">Oops! 🚧</h1>
         </header>
         <div className="flex flex-col justify-center items-center h-64 gap-4">
@@ -91,7 +105,7 @@ export default function ShopList() {
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
       <header className="mb-8">
-        <button onClick={() => router.back()} className="text-yellow-400 mb-4">← Back</button>
+        <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
         <h1 className="text-2xl font-bold">Open Shops Today 🏪</h1>
         <p className="text-slate-400">Support your neighbors, buy local!</p>
         <p className="mt-2 text-[10px] text-yellow-500 font-mono italic opacity-70">
@@ -106,7 +120,7 @@ export default function ShopList() {
           neighborShops.map((shop) => (
             <div
               key={shop.id}
-              onClick={() => alert(`Shop Info: ${shop.description}`)}
+              onClick={() => handleShopClick(shop.description)}
               className="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:border-yellow-400/50 transition-all active:scale-95 cursor-pointer flex items-center gap-4"
             >
               <div className="text-4xl">{shop.icon}</div>

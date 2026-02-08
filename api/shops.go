@@ -21,7 +21,7 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 			ID:          1,
 			Name:        "Rumah Dadih",
 			Description: "Fresh chilled dadih. Multiple flavors!",
-			Icon:        "🍮",
+			Icon:        "🥛",
 			IsOpen:      true,
 		},
 		{
