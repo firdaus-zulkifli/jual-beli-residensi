@@ -3,16 +3,13 @@ import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "My MVP App",
+  title: "JualBeli Residensi Pauh",
+  description: "Community Marketplace",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // Add suppressHydrationWarning here!
+    // Add suppressHydrationWarning here to stop the red error screen
     <html lang="en" suppressHydrationWarning>
       <body>
         <Script 
