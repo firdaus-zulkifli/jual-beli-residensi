@@ -1,17 +1,41 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react'; //
+import { useEffect, useState } from 'react';
 
-// Mock data for your Alpha Testers
-const neighborShops = [
-  { id: 1, name: "Wife's Dadih A-10", description: "Fresh chilled dadih. Multiple flavors!", icon: "🍮" },
-  { id: 2, name: "Ice Cream Corner B-05", description: "Homemade vanilla and chocolate scoops.", icon: "🍦" },
-];
+type Shop = {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  is_open: boolean;
+};
 
 export default function ShopList() {
   const router = useRouter();
   const [goMessage, setGoMessage] = useState<string>("Loading from Go...");
+  const [neighborShops, setNeighborShops] = useState<Shop[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchShops = async () => {
+      try {
+        const response = await fetch('/api/shops');
+        if (!response.ok) {
+          throw new Error('Failed to fetch shops');
+        }
+        const data = await response.json();
+        setNeighborShops(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchShops();
+  }, []);
 
   useEffect(() => {
     // Vercel routes /api/hello.go to /api/hello automatically
@@ -20,6 +44,36 @@ export default function ShopList() {
       .then((data) => setGoMessage(data))
       .catch((err) => setGoMessage("Go API Error ❌"));
   }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white p-6">
+        <header className="mb-8">
+          <button onClick={() => router.back()} className="text-yellow-400 mb-4"><E2><86><90> Back</button>
+          <h1 className="text-2xl font-bold">Open Shops Today <F0><9F><8F><AA></h1>
+          <p className="text-slate-400">Support your neighbors, buy local!</p>
+        </header>
+        <div className="flex justify-center items-center h-64">
+          <p>Loading shops...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-900 text-white p-6">
+        <header className="mb-8">
+          <button onClick={() => router.back()} className="text-yellow-400 mb-4"><E2><86><90> Back</button>
+          <h1 className="text-2xl font-bold">Open Shops Today <F0><9F><8F><AA></h1>
+          <p className="text-slate-400">Support your neighbors, buy local!</p>
+        </header>
+        <div className="flex justify-center items-center h-64">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
