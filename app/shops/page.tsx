@@ -13,7 +13,6 @@ type Shop = {
 
 export default function ShopList() {
   const router = useRouter();
-  const [goMessage, setGoMessage] = useState<string>("Loading from Go...");
   const [neighborShops, setNeighborShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,19 +35,6 @@ export default function ShopList() {
     };
 
     fetchShops();
-  }, []);
-
-  useEffect(() => {
-    fetch('/api/hello')
-      .then((res) => {
-        if (!res.ok) throw new Error("API Offline");
-        return res.text();
-      })
-      .then((data) => setGoMessage(data))
-      .catch((err) => {
-        console.error("Hello API Error:", err);
-        setGoMessage("Go API Error ❌");
-      });
   }, []);
 
   const goBack = () => {
@@ -108,9 +94,6 @@ export default function ShopList() {
         <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
         <h1 className="text-2xl font-bold">Open Shops Today 🏪</h1>
         <p className="text-slate-400">Support your neighbors, buy local!</p>
-        <p className="mt-2 text-[10px] text-yellow-500 font-mono italic opacity-70">
-          Backend Status: {goMessage}
-        </p>
       </header>
 
       <div className="grid gap-4">
