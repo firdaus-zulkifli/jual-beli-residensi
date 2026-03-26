@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export async function GET() {
-  const { data: shops, error } = await supabase
+  const { data: shops, error } = await getSupabase()
     .from("shops")
     .select("id, shop_name, description, icon, is_open")
     .eq("is_open", true);

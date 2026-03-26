@@ -1,6 +1,6 @@
 import { createHmac } from 'crypto';
 import { NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
     const username = tgUser.username || tgUser.first_name || 'anonymous';
 
     // Upsert: insert if new, update username if existing
-    const { data: profile, error } = await supabaseAdmin
+    const { data: profile, error } = await getSupabaseAdmin()
       .from('profiles')
       .upsert(
         { telegram_id: telegramId, username, role: 'resident' },
