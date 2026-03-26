@@ -1,22 +1,16 @@
 import { NextResponse } from "next/server";
+import { supabase } from "@/lib/supabase";
 
 export async function GET() {
-    const shops = [
-        {
-            id: 1,
-            name: "Rumah Dadih",
-            description: "Dadih Susu Berlemak Pelbagai Perisa",
-            icon: "🥛",
-            isOpen: true,
-        },
-        {
-            id: 2,
-            name: "Ice Cream Corner",
-            description: "Homemade scoops for neighbours",
-            icon: "🍦",
-            isOpen: true,
-        },
-    ];
+  const { data: shops, error } = await supabase
+    .from("shops")
+    .select("id, shop_name, description, icon, is_open")
+    .eq("is_open", true);
 
-    return NextResponse.json(shops);
+  if (error) {
+    console.error("Shops fetch error:", error);
+    return NextResponse.json({ error: "Failed to fetch shops" }, { status: 500 });
+  }
+
+  return NextResponse.json(shops);
 }

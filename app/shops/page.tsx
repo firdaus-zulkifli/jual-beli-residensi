@@ -2,10 +2,11 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useUser } from '@/lib/UserContext';
 
 type Shop = {
-  id: number;
-  name: string;
+  id: string;
+  shop_name: string;
   description: string;
   icon: string;
   is_open: boolean;
@@ -13,11 +14,14 @@ type Shop = {
 
 export default function ShopList() {
   const router = useRouter();
+  const { access } = useUser();
   const [neighborShops, setNeighborShops] = useState<Shop[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (access !== 'granted') return;
+
     const fetchShops = async () => {
       try {
         const response = await fetch('/api/shops');
@@ -35,7 +39,7 @@ export default function ShopList() {
     };
 
     fetchShops();
-  }, []);
+  }, [access]);
 
   const goBack = () => {
     const tg = (window as any).Telegram?.WebApp;
@@ -43,19 +47,19 @@ export default function ShopList() {
     router.back();
   };
 
-  const handleShopClick = (shopDescription: string) => {
+  const handleShopClick = (shopId: string) => {
     const tg = (window as any).Telegram?.WebApp;
     if (tg?.HapticFeedback) {
       tg.HapticFeedback.impactOccurred('light');
     }
-    alert(`Shop Info: ${shopDescription}`);
+    router.push(`/shop/${shopId}`);
   };
 
-  if (loading) {
+  if (access === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-slate-900 text-white p-6">
         <header className="mb-8">
-          <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
+          <button onClick={goBack} className="text-yellow-400 mb-4">&larr; Back</button>
           <h1 className="text-2xl font-bold">Open Shops Today 🏪</h1>
           <p className="text-slate-400">Support your neighbors, buy local!</p>
         </header>
@@ -66,11 +70,20 @@ export default function ShopList() {
     );
   }
 
+  if (access === 'denied') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-10 text-center">
+        <h1 className="text-2xl font-bold text-red-500 mb-4">Access Denied</h1>
+        <p className="text-slate-400">Please open this app inside Telegram.</p>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-slate-900 text-white p-6">
         <header className="mb-8">
-          <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
+          <button onClick={goBack} className="text-yellow-400 mb-4">&larr; Back</button>
           <h1 className="text-2xl font-bold">Oops! 🚧</h1>
         </header>
         <div className="flex flex-col justify-center items-center h-64 gap-4">
@@ -91,29 +104,27 @@ export default function ShopList() {
   return (
     <div className="min-h-screen bg-slate-900 text-white p-6">
       <header className="mb-8">
-        <button onClick={goBack} className="text-yellow-400 mb-4">← Back</button>
+        <button onClick={goBack} className="text-yellow-400 mb-4">&larr; Back</button>
         <h1 className="text-2xl font-bold">Open Shops Today 🏪</h1>
         <p className="text-slate-400">Support your neighbors, buy local!</p>
       </header>
 
       <div className="grid gap-4">
         {neighborShops.length === 0 ? (
-           <p className="text-slate-500 italic">No shops available yet.</p>
+           <p className="text-slate-500 italic">No shops are open right now.</p>
         ) : (
           neighborShops.map((shop) => (
             <div
               key={shop.id}
-              onClick={() => handleShopClick(shop.description)}
+              onClick={() => handleShopClick(shop.id)}
               className="bg-slate-800 p-4 rounded-2xl border border-slate-700 hover:border-yellow-400/50 transition-all active:scale-95 cursor-pointer flex items-center gap-4"
             >
               <div className="text-4xl">{shop.icon}</div>
               <div className="flex-1">
-                <h2 className="font-bold text-lg">{shop.name}</h2>
+                <h2 className="font-bold text-lg">{shop.shop_name}</h2>
                 <p className="text-sm text-slate-400">{shop.description}</p>
               </div>
-              {shop.is_open && (
-                <span className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
-              )}
+              <span className="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
             </div>
           ))
         )}

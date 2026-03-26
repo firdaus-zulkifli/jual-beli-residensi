@@ -1,34 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUser } from '@/lib/UserContext';
 
 export default function Home() {
-  const [username, setUsername] = useState('Neighbour');
-  const [access, setAccess] = useState<'loading' | 'granted' | 'denied'>('loading');
+  const { profile, access } = useUser();
   const router = useRouter();
 
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-
-    if (tg?.initData) {
-      tg.ready();
-      tg.expand();
-
-      const name = tg.initDataUnsafe?.user?.first_name;
-      if (name) setUsername(name);
-
-      fetch('/api/auth/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ initData: tg.initData })
-      })
-      .then(res => res.ok ? setAccess('granted') : setAccess('denied'))
-      .catch(() => setAccess('denied'));
-    } else {
-      setAccess('denied');
-    }
-  }, []);
+  const username = profile?.username || 'Neighbour';
 
   const handleEnter = () => {
     const tg = (window as any).Telegram?.WebApp;

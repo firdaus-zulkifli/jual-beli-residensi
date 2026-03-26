@@ -1,5 +1,6 @@
 import { createHmac } from 'crypto';
 import { NextResponse } from 'next/server';
+import { supabaseAdmin } from '@/lib/supabase';
 
 export async function POST(req: Request) {
   try {
@@ -25,12 +26,38 @@ export async function POST(req: Request) {
       .update(dataCheckString)
       .digest('hex');
 
-    if (hmac === hash) {
-      return NextResponse.json({ success: true });
+    if (hmac !== hash) {
+      return NextResponse.json({ success: false }, { status: 403 });
     }
 
-    return NextResponse.json({ success: false }, { status: 403 });
+    // --- Telegram verification passed, now upsert the user profile ---
+    const userRaw = urlParams.get('user');
+    if (!userRaw) {
+      return NextResponse.json({ success: false, error: 'No user data' }, { status: 400 });
+    }
+
+    const tgUser = JSON.parse(decodeURIComponent(userRaw));
+    const telegramId = tgUser.id;
+    const username = tgUser.username || tgUser.first_name || 'anonymous';
+
+    // Upsert: insert if new, update username if existing
+    const { data: profile, error } = await supabaseAdmin
+      .from('profiles')
+      .upsert(
+        { telegram_id: telegramId, username, role: 'resident' },
+        { onConflict: 'telegram_id', ignoreDuplicates: false }
+      )
+      .select('id, telegram_id, username, role')
+      .single();
+
+    if (error) {
+      console.error('Supabase upsert error:', error);
+      return NextResponse.json({ success: false, error: 'DB error' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, profile });
   } catch (e) {
+    console.error('Auth verify error:', e);
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
